@@ -1,0 +1,1 @@
+# SzGrafika2026
