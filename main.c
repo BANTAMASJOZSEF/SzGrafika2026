@@ -16,13 +16,16 @@ void reshape(int width, int height) {
     gluPerspective(60.0, (double)width / (double)height, 0.1, 1000.0);
 }
 
-void idle() {
+
+void timer(int value) {
     double current_time = (double)glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     double delta_time = current_time - app.last_update_time;
     app.last_update_time = current_time;
 
     update_app(&app, delta_time);
     glutPostRedisplay();
+
+    glutTimerFunc(16, timer, 0);
 }
 
 void key_down(unsigned char key, int x, int y) {
@@ -52,11 +55,11 @@ int main(int argc, char** argv) {
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutIdleFunc(idle);
     glutKeyboardFunc(key_down);
     glutKeyboardUpFunc(key_up);
     glutSpecialFunc(special_down);
     glutSpecialUpFunc(special_up);
+    glutTimerFunc(0, timer, 0);
 
     app.last_update_time = (double)glutGet(GLUT_ELAPSED_TIME) / 1000.0;
     
