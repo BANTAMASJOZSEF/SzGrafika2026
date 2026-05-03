@@ -1,21 +1,42 @@
 # Helikopter Szimulátor: Erdőtűz (Számítógép Grafika Féléves Feladat)
 
 **Név:** Bán Tamás József
-
 **Neptun kód:** QTMKZZ
-
-**Gyakorlati Óra:** Csüt 12-14
+**Gyakorlati Óra:** Csütörtök 12-14
 
 ## 1. A feladat koncepciója
-A projekt egy 3D-s helikopter szimulátor, amelyben a játékos egy tűzoltó/kutató helikoptert irányít egy sűrű, részben lángoló erdő felett. A program célja a térbeli mozgás, a dinamikus megvilágítás, valamint az interaktív és veszélyes környezet bemutatása. A kamera folyamatosan követi a járművet (Third-person view).
+A projekt egy interaktív 3D-s helikopter szimulátor, ahol a játékos egy kutató-mentő helikoptert irányít egy dinamikusan generált erdős terület felett. A program központi eleme egy erdőtűz szimulációja, amely köré a grafikai és fizikai megoldások épülnek. A kamera folyamatosan követi a járművet (TPS nézet), biztosítva a folyamatos térérzékelést.
 
-## 2. Tervezett plusz funkciók
-1. **Részecskerendszerek (Tűz és füst):** Az égő erdő hatásának eléréséhez a fák körül dinamikus tűz- és füsteffektek jelennek meg.
-2. **Dinamikus Árnyék:** Valós idejű árnyékvetés a helikopterre és a fákra a fényforrás (Nap) pozíciója alapján.
-3. **Köd:** Dinamikusan, futásidőben változtatható sűrűségű ködhatás, amely a füstös, rossz látási viszonyokat szimulálja.
-4. **Ütközésvizsgálat (Bounding-box):** A helikopter fizikai kiterjedéssel rendelkezik, így nem repülhet át indokolatlanul a fákon, és nem mehet a talajszint alá.
-5. **Térkép:** A képernyő bal alsó sarkában jelzi a helikopter helyzetét a pályán felülnézetből.
-+ Plusz: Állítható sebesség, hogy a helikopter gyorsabban/lassabban mozogjon előre/hátra & fel/le (WASD & QE)
+## 2. Technikai Megvalósítás és Megoldások
 
-## 3. Fordítás és Futtatás
-A program C nyelven, OpenGL és GLUT könyvtárak felhasználásával készült. A forráskód a `make` parancs kiadásával lefordítható.
+### Grafikai Motor és Ablakkezelés
+A program **OpenGL** és **SDL2** könyvtárakat használ.
+
+### Objektumkezelés és Geometria
+- **Modellbetöltés**: A helikopter egyedi `.obj` fájlból töltődik be, a hozzá tartozó textúra pedig SDL2_image segítségével kerül a GPU memóriájába.
+- **Procedurális fák**: A pálya 400 darab, véletlenszerűen generált fenyőfát tartalmaz. A fák elhelyezése inicializáláskor egy ütközésfigyelő algoritmussal történik, hogy elkerüljék az egymásba lógást és a pálya lefedését.
+- **Magas betonfal**: Egy statikus akadály, amely a fizikai interakciók tesztelésére szolgál.
+
+### Dinamikus Effektek (Plusz funkciók)
+1. **Részecskerendszerek (Tűz és füst)**: A központi tűzfészek részecskékből áll, amelyek élettartama, mérete és átlátszósága (Alpha-blending) dinamikusan változik. A füst részecskék figyelembe veszik a szélhatást és a fal ütközéseit.
+2. **Dinamikus Megvilágítás és Árnyék**: A program `GL_LIGHT0` fényforrást használ. Megvalósításra került egy **nappal/éjszaka ciklus**, ahol az 'I' és 'K' gombokkal állítható a fényerő. Ez nemcsak a modellek Diffuse és Ambient fényét, hanem a háttérszínt és a köd színét is módosítja.
+3. **Fizikai szimuláció**:
+    - **Ütközésvizsgálat**: Bounding-sphere és Bounding-box alapú ütközés a fákkal és a fallal.
+    - **Visszapattanás**: A helikopter nagy sebességű ütközés esetén "biliárd-szerűen" pattan vissza a falról (beesési szög = visszaverődési szög logika alapján).
+4. **2D HUD és Minimap**: A képernyőn egy fix, **1024x768-as virtuális felbontású** réteg található. Ez garantálja, hogy a Minimap, a sebességmérő (SPD) és a magasságmérő (ALT) bármilyen ablakfelbontás mellett olvasható maradjon.
+
+## 3. Projektszerkezet
+A forráskód a tanári kérésnek megfelelően logikai jegyzékekbe van szervezve:
+
+- `src/`: A forrásfájlok (.c), mint a `main.c`, `app.c`, `scene.c`.
+- `include/`: A fejlécfájlok (.h) dokumentált interfészekkel.
+- `assets/`: A modelleket és textúrákat tartalmazó könyvtár.
+- `Makefile`: A projekt fordítását automatizáló szkript.
+
+## 4. Irányítás
+- **W, S**: Előre / Hátra mozgatás
+- **A, D**: Balra / Jobbra fordulás
+- **Q, E**: Emelkedés / Süllyedés
+- **I, K ( + , - )**: Fényerő növelése / csökkentése (Nappal/Éjszaka)
+- **F1 vagy H**: Használati útmutató megjelenítése
+- **ESC**: Kilépés
