@@ -19,6 +19,7 @@ typedef struct {
     
     // Fényerő és Help menü állapot (Követelményekhez)
     float light_intensity;
+    float sun_angle;
     bool show_help;
     
     Scene scene;

@@ -35,10 +35,6 @@ typedef struct {
     Tree trees[MAX_TREES];
     Particle particles[MAX_PARTICLES];
     float fire_x, fire_z;
-    
-    // Fal adatai
-    float wall_x, wall_z;
-    float wall_width, wall_height, wall_depth;
 } Scene;
 
 /**
@@ -60,11 +56,6 @@ void draw_ground(Scene* scene);
  * @brief Kirajzolja a fákat.
  */
 void draw_trees(Scene* scene, bool is_shadow);
-
-/**
- * @brief Kirajzolja az akadályt (fal).
- */
-void draw_wall(Scene* scene);
 
 /**
  * @brief Kirajzolja a részecskéket.
