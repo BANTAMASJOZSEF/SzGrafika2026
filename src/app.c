@@ -82,7 +82,7 @@ bool check_collision(Helicopter* heli, Scene* scene) {
     for (int i = 0; i < MAX_TREES; i++) {
         Tree* tree = &scene->trees[i];
         float tree_radius = 1.5f * tree->scale; 
-        float tree_height = 8.0f * tree->scale;
+        float tree_height = 10.0f * tree->scale;
         float dx = heli->x - tree->x;
         float dz = heli->z - tree->z;
         float distance = sqrt(dx * dx + dz * dz);
@@ -99,7 +99,8 @@ void init_app(App* app) {
         app->special_keys[i] = false;
     }
     app->last_update_time = 0.0;
-    app->light_intensity = 1.0f; 
+    app->light_intensity = 1.0f;
+    app->sun_angle = 0.0f; // nap kezdő szög
     app->show_help = false;
     
     init_scene(&app->scene);
@@ -116,6 +117,8 @@ void init_app(App* app) {
 void update_app(App* app, double delta_time) {
     if (app->keys['i'] || app->keys['I'] || app->keys['+'] || app->keys[43]) app->light_intensity += 1.0f * delta_time;
     if (app->keys['k'] || app->keys['K'] || app->keys['-'] || app->keys[45]) app->light_intensity -= 1.0f * delta_time;
+    if (app->keys['u'] || app->keys['U']) app->sun_angle -= 2.0f * delta_time;
+    if (app->keys['o'] || app->keys['O']) app->sun_angle += 2.0f * delta_time;
     if (app->light_intensity < 0.0f) app->light_intensity = 0.0f;
     if (app->light_intensity > 2.0f) app->light_intensity = 2.0f;
 
@@ -156,32 +159,13 @@ void update_app(App* app, double delta_time) {
     update_helicopter(&app->helicopter, delta_time);
     update_scene(&app->scene, delta_time);
     
-    float min_height = 3.0f; 
+    float min_height = 2.5f; 
     if (app->helicopter.y < min_height) app->helicopter.y = min_height;
     
     if (check_collision(&app->helicopter, &app->scene)) {
         app->helicopter.x = old_x;
         app->helicopter.y = old_y;
         app->helicopter.z = old_z;
-    }
-
-    float heli_r = 2.0f;
-    if (app->helicopter.x + heli_r > app->scene.wall_x - app->scene.wall_width/2.0f &&
-        app->helicopter.x - heli_r < app->scene.wall_x + app->scene.wall_width/2.0f &&
-        app->helicopter.z + heli_r > app->scene.wall_z - app->scene.wall_depth/2.0f &&
-        app->helicopter.z - heli_r < app->scene.wall_z + app->scene.wall_depth/2.0f &&
-        app->helicopter.y < app->scene.wall_height) {
-        
-        app->helicopter.x = old_x;
-        app->helicopter.y = old_y;
-        app->helicopter.z = old_z;
-        
-        if (app->helicopter.base_speed > 100.0f) {
-            app->helicopter.rotation_y += 180.0f;
-            app->helicopter.base_speed *= 0.5f;   
-        } else {
-            app->helicopter.base_speed = 0.0f;    
-        }
     }
 }
 
@@ -208,7 +192,9 @@ void render_app(App* app) {
     float cam_y = app->helicopter.y + cam_height;
     gluLookAt(cam_x, cam_y, cam_z, app->helicopter.x, app->helicopter.y, app->helicopter.z, 0.0f, 1.0f, 0.0f);
     
-    GLfloat light_dir[] = { 1.5f, 2.0f, 1.0f, 0.0f }; 
+    float sun_x = cos(app->sun_angle) * 3.0f;
+    float sun_z = sin(app->sun_angle) * 3.0f;
+    GLfloat light_dir[] = { sun_x, 2.0f, sun_z, 0.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, light_dir);
 
     GLfloat current_ambient[] = {0.2f * app->light_intensity, 0.2f * app->light_intensity, 0.2f * app->light_intensity, 1.0f};
@@ -237,7 +223,6 @@ void render_app(App* app) {
     glEnable(GL_LIGHTING);
 
     draw_trees(&app->scene, false); 
-    draw_wall(&app->scene);
     draw_helicopter(&app->helicopter, false);
     draw_particles(&app->scene);
 
@@ -353,13 +338,17 @@ void render_app(App* app) {
         
         // Fények szekció
         glColor3f(0.0f, 1.0f, 1.0f);
-        draw_text("+ / -      - FENYERO PLUSZ / MINUSZ", hm + 40, start_y + line_h*3.5f, text_size);
-        draw_text("I / K     - FENYERO (ALTERNATIV)", hm + 40, start_y + line_h*4.5f, text_size);
+        draw_text("+ / -      - FENYERO PLUSZ / MINUSZ", hm + 40, start_y + line_h*3.5, text_size);
+        draw_text("I / K     - FENYERO (ALTERNATIV)", hm + 40, start_y + line_h*4.5, text_size);
+
+        // Nap szekció
+        draw_text("U / O - Nap szögének állítása", hm + 40, start_y + line_h*6, text_size);
+        draw_text("U / O - Nap szögének állítása", hm + 40, start_y + line_h*7, text_size);
         
         // Egyéb szekció
         glColor3f(1.0f, 0.5f, 0.0f);
-        draw_text("ESC       - KILEPES A JATEKBOL", hm + 40, start_y + line_h*6, text_size);
-        draw_text("F1 VAGY H - EZ A MENU ELREJTESE", hm + 40, start_y + line_h*7, text_size);
+        draw_text("ESC       - KILEPES A JATEKBOL", hm + 40, start_y + line_h*9, text_size);
+        draw_text("F1 VAGY H - EZ A MENU ELREJTESE", hm + 40, start_y + line_h*10, text_size);
     }
 
     glDisable(GL_BLEND);
