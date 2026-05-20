@@ -23,7 +23,7 @@ typedef struct {
 void init_helicopter(Helicopter* heli);
 
 /**
- * @brief Frissíti a helikopter belső állapotát (pl. rotor forgatása).
+ * @brief Frissíti a helikopter belső állapotát.
  * @param heli Mutató a Helicopter struktúrára.
  * @param delta_time Az előző képkocka óta eltelt idő másodpercben (időfüggő animációhoz).
  */
