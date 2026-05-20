@@ -10,7 +10,6 @@
 typedef struct {
     float x, y, z;          /**< A helikopter térbeli pozíciója (x, y, z koordináták) */
     float rotation_y;       /**< A helikopter elfordulása az Y tengely körül (fokokban) */
-    float rotor_angle;      /**< A főrotor aktuális forgási szöge (az animációhoz) */
     float base_speed;       /**< A helikopter haladási sebessége (km/h vagy egység/sec) */
     GLuint model_id;        /**< A betöltött 3D modell (OBJ) OpenGL display list azonosítója */
     GLuint texture_id;      /**< A helikopterre feszített textúra OpenGL azonosítója */
@@ -36,6 +35,7 @@ void update_helicopter(Helicopter* heli, double delta_time);
  * @param speed A mozgás sebessége (delta_time-mal szorozva).
  * @param direction Az irány (1.0f = előre, -1.0f = hátra).
  */
+
 void move_helicopter(Helicopter* heli, float speed, float direction);
 
 /**
