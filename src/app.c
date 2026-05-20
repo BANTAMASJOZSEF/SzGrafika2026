@@ -65,7 +65,7 @@ bool init_app(App* app, int width, int height) {
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     app->window = SDL_CreateWindow(
-        "Helikopter Szimulator",
+        "Helikopter Szimulator - QTMKZZ",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         width, height,
         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
@@ -95,7 +95,7 @@ bool init_app(App* app, int width, int height) {
     glEnable(GL_NORMALIZE);
     glEnable(GL_FOG);
     
-    // Kezdeti perspektíva beállítás (GLU MENTES)
+    // Kezdeti perspektíva beállítás
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     double pi = 3.14159265358979323846;
