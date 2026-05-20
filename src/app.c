@@ -1,80 +1,43 @@
 #include "app.h"
+#include "particle.h"
 #include <GL/gl.h>
-#include <GL/glu.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
-// szövegrajzoló (A-Z, 0-9, jelek)
-void draw_text(const char* text, float x, float y, float scale) {
-    float offset = 0.0f;
-    while (*text) {
-        char c = *text;
-        if (c >= 'a' && c <= 'z') c -= 32; // Nagybetűsítés
-        
-        if (c == ' ') {
-            offset += scale * 1.5f;
-            text++;
-            continue;
-        }
-        
-        glPushMatrix();
-        glTranslatef(x + offset, y, 0.0f);
-        glScalef(scale, scale, 1.0f);
-        glBegin(GL_LINES);
-        
-        switch(c) {
-            case 'A': glVertex2f(0,1); glVertex2f(0.5f,0); glVertex2f(0.5f,0); glVertex2f(1,1); glVertex2f(0.2f,0.6f); glVertex2f(0.8f,0.6f); break;
-            case 'B': glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0.8f,0); glVertex2f(0.8f,0); glVertex2f(1,0.25f); glVertex2f(1,0.25f); glVertex2f(0.8f,0.5f); glVertex2f(0.8f,0.5f); glVertex2f(0,0.5f); glVertex2f(0.8f,0.5f); glVertex2f(1,0.75f); glVertex2f(1,0.75f); glVertex2f(0.8f,1); glVertex2f(0.8f,1); glVertex2f(0,1); break;
-            case 'C': glVertex2f(1,0); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); break;
-            case 'D': glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0.7f,0); glVertex2f(0.7f,0); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(0.7f,1); glVertex2f(0.7f,1); glVertex2f(0,1); break;
-            case 'E': glVertex2f(1,0); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); glVertex2f(0,0.5f); glVertex2f(0.8f,0.5f); break;
-            case 'F': glVertex2f(1,0); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,0.5f); glVertex2f(0.8f,0.5f); break;
-            case 'G': glVertex2f(1,0); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(0.5f,0.5f); break;
-            case 'H': glVertex2f(0,0); glVertex2f(0,1); glVertex2f(1,0); glVertex2f(1,1); glVertex2f(0,0.5f); glVertex2f(1,0.5f); break;
-            case 'I': glVertex2f(0.5f,0); glVertex2f(0.5f,1); glVertex2f(0.2f,0); glVertex2f(0.8f,0); glVertex2f(0.2f,1); glVertex2f(0.8f,1); break;
-            case 'J': glVertex2f(1,0); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(0,0.5f); break;
-            case 'K': glVertex2f(0,0); glVertex2f(0,1); glVertex2f(1,0); glVertex2f(0,0.5f); glVertex2f(0,0.5f); glVertex2f(1,1); break;
-            case 'L': glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); break;
-            case 'M': glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0.5f,0.5f); glVertex2f(0.5f,0.5f); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,1); break;
-            case 'N': glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(1,0); break;
-            case 'O': case '0': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(0,0); break;
-            case 'P': glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(0,0.5f); break;
-            case 'Q': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0.5f,0.5f); glVertex2f(1.2f,1.2f); break;
-            case 'R': glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(0,0.5f); glVertex2f(0,0.5f); glVertex2f(1,1); break;
-            case 'S': case '5': glVertex2f(1,0); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0,0.5f); glVertex2f(0,0.5f); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(0,1); break;
-            case 'T': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(0.5f,0); glVertex2f(0.5f,1); break;
-            case 'U': glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(1,0); break;
-            case 'V': glVertex2f(0,0); glVertex2f(0.5f,1); glVertex2f(0.5f,1); glVertex2f(1,0); break;
-            case 'W': glVertex2f(0,0); glVertex2f(0.2f,1); glVertex2f(0.2f,1); glVertex2f(0.5f,0.5f); glVertex2f(0.5f,0.5f); glVertex2f(0.8f,1); glVertex2f(0.8f,1); glVertex2f(1,0); break;
-            case 'X': glVertex2f(0,0); glVertex2f(1,1); glVertex2f(1,0); glVertex2f(0,1); break;
-            case 'Y': glVertex2f(0,0); glVertex2f(0.5f,0.5f); glVertex2f(1,0); glVertex2f(0.5f,0.5f); glVertex2f(0.5f,0.5f); glVertex2f(0.5f,1); break;
-            case 'Z': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); break;
-            
-            case '1': glVertex2f(0.5f,0); glVertex2f(0.5f,1); glVertex2f(0.2f,0.2f); glVertex2f(0.5f,0); break;
-            case '2': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(0,0.5f); glVertex2f(0,0.5f); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); break;
-            case '3': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(0,1); glVertex2f(0,0.5f); glVertex2f(1,0.5f); break;
-            case '4': glVertex2f(0,0); glVertex2f(0,0.5f); glVertex2f(0,0.5f); glVertex2f(1,0.5f); glVertex2f(1,0); glVertex2f(1,1); break;
-            case '6': glVertex2f(1,0); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(0,0.5f); break;
-            case '7': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,1); break;
-            case '8': glVertex2f(0,0); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(0,1); glVertex2f(0,1); glVertex2f(0,0); glVertex2f(0,0.5f); glVertex2f(1,0.5f); break;
-            case '9': glVertex2f(0,1); glVertex2f(1,1); glVertex2f(1,1); glVertex2f(1,0); glVertex2f(1,0); glVertex2f(0,0); glVertex2f(0,0); glVertex2f(0,0.5f); glVertex2f(0,0.5f); glVertex2f(1,0.5f); break;
-            
-            case '-': glVertex2f(0,0.5f); glVertex2f(1,0.5f); break;
-            case '+': glVertex2f(0,0.5f); glVertex2f(1,0.5f); glVertex2f(0.5f,0); glVertex2f(0.5f,1); break;
-            case '.': glVertex2f(0.4f,0.9f); glVertex2f(0.6f,0.9f); break;
-            case ',': glVertex2f(0.4f,0.9f); glVertex2f(0.6f,0.9f); glVertex2f(0.6f,0.9f); glVertex2f(0.4f,1.1f); break;
-            case ':': glVertex2f(0.4f,0.2f); glVertex2f(0.6f,0.2f); glVertex2f(0.4f,0.8f); glVertex2f(0.6f,0.8f); break;
-            case '/': glVertex2f(0,1); glVertex2f(1,0); break;
-            case '(': glVertex2f(0.5f,0); glVertex2f(0,0.5f); glVertex2f(0,0.5f); glVertex2f(0.5f,1); break;
-            case ')': glVertex2f(0.5f,0); glVertex2f(1,0.5f); glVertex2f(1,0.5f); glVertex2f(0.5f,1); break;
-        }
-        
-        glEnd();
-        glPopMatrix();
-        
-        offset += scale * 1.5f; 
-        text++;
-    }
+// --- SAJÁT MATEMATIKAI FÜGGVÉNYEK A GLU HELYETTESÍTÉSÉRE ---
+
+void my_lookAt(float eyex, float eyey, float eyez,
+               float centerx, float centery, float centerz,
+               float upx, float upy, float upz) {
+    float forward[3], side[3], up[3];
+    float matrix[16], inv_len;
+
+    forward[0] = centerx - eyex;
+    forward[1] = centery - eyey;
+    forward[2] = centerz - eyez;
+
+    inv_len = 1.0f / sqrt(forward[0]*forward[0] + forward[1]*forward[1] + forward[2]*forward[2]);
+    forward[0] *= inv_len; forward[1] *= inv_len; forward[2] *= inv_len;
+
+    side[0] = forward[1] * upz - forward[2] * upy;
+    side[1] = forward[2] * upx - forward[0] * upz;
+    side[2] = forward[0] * upy - forward[1] * upx;
+
+    inv_len = 1.0f / sqrt(side[0]*side[0] + side[1]*side[1] + side[2]*side[2]);
+    side[0] *= inv_len; side[1] *= inv_len; side[2] *= inv_len;
+
+    up[0] = side[1] * forward[2] - side[2] * forward[1];
+    up[1] = side[2] * forward[0] - side[0] * forward[2];
+    up[2] = side[0] * forward[1] - side[1] * forward[0];
+
+    matrix[0] = side[0];  matrix[4] = side[1];  matrix[8] = side[2];   matrix[12] = 0.0f;
+    matrix[1] = up[0];    matrix[5] = up[1];    matrix[9] = up[2];     matrix[13] = 0.0f;
+    matrix[2] = -forward[0]; matrix[6] = -forward[1]; matrix[10] = -forward[2]; matrix[14] = 0.0f;
+    matrix[3] = 0.0f;     matrix[7] = 0.0f;     matrix[11] = 0.0f;     matrix[15] = 1.0f;
+
+    glMultMatrixf(matrix);
+    glTranslatef(-eyex, -eyey, -eyez);
 }
 
 bool check_collision(Helicopter* heli, Scene* scene) {
@@ -93,14 +56,33 @@ bool check_collision(Helicopter* heli, Scene* scene) {
     return false;
 }
 
-void init_app(App* app) {
-    for (int i = 0; i < 256; i++) {
-        app->keys[i] = false;
-        app->special_keys[i] = false;
-    }
-    app->last_update_time = 0.0;
+// --- APP RENDSZER FÜGGVÉNYEK ---
+
+bool init_app(App* app, int width, int height) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) return false;
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+    app->window = SDL_CreateWindow(
+        "Helikopter Szimulator",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        width, height,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+    );
+    if (!app->window) return false;
+
+    app->gl_context = SDL_GL_CreateContext(app->window);
+    if (!app->gl_context) return false;
+
+    app->is_running = true;
+    app->last_time = SDL_GetTicks();
+    
+    memset(app->keys, 0, sizeof(app->keys));
+    memset(app->special_keys, 0, sizeof(app->special_keys));
+    
     app->light_intensity = 1.0f;
-    app->sun_angle = 0.0f; // nap kezdő szög
+    app->sun_angle = 0.0f;
     app->show_help = false;
     
     init_scene(&app->scene);
@@ -112,15 +94,88 @@ void init_app(App* app) {
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_NORMALIZE);
     glEnable(GL_FOG);
+    
+    // Kezdeti perspektíva beállítás (GLU MENTES)
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    double pi = 3.14159265358979323846;
+    double fH = tan((60.0 / 2.0) / 180.0 * pi) * 0.1;
+    double fW = fH * ((double)width / (double)height);
+    glFrustum(-fW, fW, -fH, fH, 0.1, 1000.0);
+    glMatrixMode(GL_MODELVIEW);
+
+    init_hud(&app->hud, 1024.0f, 768.0f);
+    return true;
 }
 
-void update_app(App* app, double delta_time) {
+void handle_app_events(App* app) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            app->is_running = false;
+        }
+        else if (event.type == SDL_WINDOWEVENT) {
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                int width = event.window.data1;
+                int height = event.window.data2;
+                if (height == 0) height = 1;
+                glViewport(0, 0, width, height);
+                glMatrixMode(GL_PROJECTION);
+                glLoadIdentity();
+                double pi = 3.14159265358979323846;
+                double fH = tan((60.0 / 2.0) / 180.0 * pi) * 0.1;
+                double fW = fH * ((double)width / (double)height);
+                glFrustum(-fW, fW, -fH, fH, 0.1, 1000.0);
+                glMatrixMode(GL_MODELVIEW);
+            }
+        }
+        else if (event.type == SDL_KEYDOWN) {
+            SDL_Keycode key = event.key.keysym.sym;
+            if (key == SDLK_ESCAPE) {
+                app->is_running = false;
+            }
+            if (key < 256) {
+                app->keys[key] = true;
+            }
+            
+            // Numpad és speciális gombok
+            if (key == SDLK_KP_PLUS) app->keys['+'] = true;
+            if (key == SDLK_KP_MINUS) app->keys['-'] = true;
+            if (key == SDLK_UP)    app->special_keys[101] = true;
+            if (key == SDLK_DOWN)  app->special_keys[103] = true;
+            if (key == SDLK_LEFT)  app->special_keys[100] = true;
+            if (key == SDLK_RIGHT) app->special_keys[102] = true;
+            if (key == SDLK_F1)    app->special_keys[1] = true;
+        }
+        else if (event.type == SDL_KEYUP) {
+            SDL_Keycode key = event.key.keysym.sym;
+            if (key < 256) {
+                app->keys[key] = false;
+            }
+            
+            // Numpad és speciális gombok
+            if (key == SDLK_KP_PLUS) app->keys['+'] = false;
+            if (key == SDLK_KP_MINUS) app->keys['-'] = false;
+            if (key == SDLK_UP)    app->special_keys[101] = false;
+            if (key == SDLK_DOWN)  app->special_keys[103] = false;
+            if (key == SDLK_LEFT)  app->special_keys[100] = false;
+            if (key == SDLK_RIGHT) app->special_keys[102] = false;
+            if (key == SDLK_F1)    app->special_keys[1] = false;
+        }
+    }
+}
+
+void update_app(App* app) {
+    Uint32 current_time = SDL_GetTicks();
+    float delta_time = (current_time - app->last_time) / 1000.0f;
+    app->last_time = current_time;
+
     if (app->keys['i'] || app->keys['I'] || app->keys['+'] || app->keys[43]) app->light_intensity += 1.0f * delta_time;
     if (app->keys['k'] || app->keys['K'] || app->keys['-'] || app->keys[45]) app->light_intensity -= 1.0f * delta_time;
     if (app->keys['u'] || app->keys['U']) app->sun_angle -= 2.0f * delta_time;
     if (app->keys['o'] || app->keys['O']) app->sun_angle += 2.0f * delta_time;
-    if (app->light_intensity < 0.0f) app->light_intensity = 0.0f;
-    if (app->light_intensity > 2.0f) app->light_intensity = 2.0f;
+    if (app->light_intensity < 0.0f) app->light_intensity = 0.0f; // fény min
+    if (app->light_intensity > 1.0f) app->light_intensity = 1.0f; // fény max
 
     if (app->special_keys[1] || app->keys['h'] || app->keys['H']) {
         app->show_help = true;
@@ -190,173 +245,75 @@ void render_app(App* app) {
     float cam_x = app->helicopter.x - sin(rad) * cam_dist;
     float cam_z = app->helicopter.z - cos(rad) * cam_dist;
     float cam_y = app->helicopter.y + cam_height;
-    gluLookAt(cam_x, cam_y, cam_z, app->helicopter.x, app->helicopter.y, app->helicopter.z, 0.0f, 1.0f, 0.0f);
     
+    // GLU HELYETT A SAJÁT KAMERA
+    my_lookAt(cam_x, cam_y, cam_z, app->helicopter.x, app->helicopter.y, app->helicopter.z, 0.0f, 1.0f, 0.0f);
+    
+    // --- FÉNY ÉS SÖTÉTEDÉS BEÁLLÍTÁSA ---
     float sun_x = cos(app->sun_angle) * 3.0f;
     float sun_z = sin(app->sun_angle) * 3.0f;
     GLfloat light_dir[] = { sun_x, 2.0f, sun_z, 0.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, light_dir);
 
-    GLfloat current_ambient[] = {0.2f * app->light_intensity, 0.2f * app->light_intensity, 0.2f * app->light_intensity, 1.0f};
-    GLfloat current_diffuse[] = {0.8f * app->light_intensity, 0.8f * app->light_intensity, 0.8f * app->light_intensity, 1.0f};
+    float intensity = app->light_intensity;
+    float amb = 0.2f * intensity;
+    if (amb < 0.1f) amb = 0.1f; // A holdfény minimuma
+
+    // A GL_LIGHT0 beállításai
+    GLfloat current_ambient[] = {amb, amb, amb, 1.0f};
+    GLfloat current_diffuse[] = {0.8f * intensity, 0.8f * intensity, 0.8f * intensity, 1.0f};
+    GLfloat current_specular[] = {0.5f * intensity, 0.5f * intensity, 0.5f * intensity, 1.0f};
+
     glLightfv(GL_LIGHT0, GL_AMBIENT, current_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, current_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, current_specular);
+
+    GLfloat global_ambient[] = {amb, amb, amb, 1.0f};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
 
     draw_ground(&app->scene);
 
-    glDisable(GL_LIGHTING); 
-    glPushMatrix();
-    glTranslatef(0.0f, 0.05f, 0.0f); 
-    
-    float shadow_matrix[16] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        -light_dir[0]/light_dir[1], 0.0f, -light_dir[2]/light_dir[1], 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-    glMultMatrixf(shadow_matrix);
-    
-    draw_trees(&app->scene, true); 
-    draw_helicopter(&app->helicopter, true);
-    glPopMatrix();
+    if (app->light_intensity > 0.6f) {
+        glDisable(GL_LIGHTING); 
+        glPushMatrix();
+        glTranslatef(0.0f, 0.05f, 0.0f); 
+        
+        float shadow_matrix[16] = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            -light_dir[0]/light_dir[1], 0.0f, -light_dir[2]/light_dir[1], 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        };
+        glMultMatrixf(shadow_matrix);
+        
+        draw_trees(&app->scene, true); 
+        draw_helicopter(&app->helicopter, true);
+        glPopMatrix();
+    }
 
     glEnable(GL_LIGHTING);
 
     draw_trees(&app->scene, false); 
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    GLfloat black_emission[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black_emission);
+    GLfloat mat_specular[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    
     draw_helicopter(&app->helicopter, false);
-    draw_particles(&app->scene);
+    draw_particle_system(&app->scene.particle_system);
 
-    // --- VIRTUALIS 2D-S FELULET RAJZOLASA (Meretezes elleni vedelem) ---
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    
-    // FIX BELSŐ FELBONTÁS A HUD-HOZ (Így sosem lóg ki semmi!)
-    float virtual_w = 1024.0f;
-    float virtual_h = 768.0f;
-    gluOrtho2D(0, virtual_w, virtual_h, 0); 
-    
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    
-    // Minimap rajzolása
-    float map_size = 200.0f; 
-    float margin = 20.0f;
-    float center_x = virtual_w - (map_size / 2.0f) - margin;
-    float center_y = virtual_h - (map_size / 2.0f) - margin;
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
-    glBegin(GL_QUADS);
-    glVertex2f(center_x - map_size/2, center_y - map_size/2);
-    glVertex2f(center_x + map_size/2, center_y - map_size/2);
-    glVertex2f(center_x + map_size/2, center_y + map_size/2);
-    glVertex2f(center_x - map_size/2, center_y + map_size/2);
-    glEnd();
-    
-    float angle_rad = app->helicopter.rotation_y * 3.14159f / 180.0f;
-    float scale = 1.2f; 
-    float cos_a = cos(angle_rad);
-    float sin_a = sin(angle_rad);
-    
-    glColor3f(0.0f, 0.8f, 0.0f);
-    glPointSize(2.0f);
-    glBegin(GL_POINTS);
-    for(int i = 0; i < MAX_TREES; i++) {
-        float dx = app->scene.trees[i].x - app->helicopter.x;
-        float dz = app->scene.trees[i].z - app->helicopter.z;
-        float lx = dx * cos_a - dz * sin_a;
-        float lz = dx * sin_a + dz * cos_a;
-        if (fabs(lx * scale) < map_size/2 && fabs(lz * scale) < map_size/2) {
-            glVertex2f(center_x - lx * scale, center_y - lz * scale);
-        }
+    render_hud(&app->hud, &app->helicopter, &app->scene, app->show_help);
+    SDL_GL_SwapWindow(app->window);
+}
+
+void destroy_app(App* app) {
+    if (app->gl_context) {
+        SDL_GL_DeleteContext(app->gl_context);
     }
-    glEnd();
-    
-    glColor3f(1.0f, 0.5f, 0.0f);
-    glPointSize(5.0f);
-    glBegin(GL_POINTS);
-    float fdx = app->scene.fire_x - app->helicopter.x;
-    float fdz = app->scene.fire_z - app->helicopter.z;
-    float flx = fdx * cos_a - fdz * sin_a;
-    float flz = fdx * sin_a + fdz * cos_a;
-    if (fabs(flx * scale) < map_size/2 && fabs(flz * scale) < map_size/2) {
-        glVertex2f(center_x - flx * scale, center_y - flz * scale);
+    if (app->window) {
+        SDL_DestroyWindow(app->window);
     }
-    glEnd();
-    
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(center_x, center_y);
-    for(int i = 0; i <= 360; i += 20) {
-        float r = i * 3.14159f / 180.0f;
-        glVertex2f(center_x + cos(r) * 6, center_y + sin(r) * 6);
-    }
-    glEnd();
-    glBegin(GL_TRIANGLES);
-    glVertex2f(center_x, center_y - 15);
-    glVertex2f(center_x - 6, center_y - 6);
-    glVertex2f(center_x + 6, center_y - 6);
-    glEnd();
-
-    // --- HUD: Magasság és Sebesség ---
-    char hud_data[64];
-    glColor3f(1.0f, 1.0f, 0.0f); 
-    sprintf(hud_data, "ALT: %.1f M", app->helicopter.y);
-    draw_text(hud_data, virtual_w - 340, 40, 15.0f);
-
-    sprintf(hud_data, "SPD: %.1f KM/H", app->helicopter.base_speed);
-    draw_text(hud_data, virtual_w - 340, 70, 15.0f);
-    
-    // --- RÉSZLETES HELP MENÜ ---
-    if (app->show_help) {
-        glColor4f(0.0f, 0.0f, 0.0f, 0.85f);
-        float hm = 100.0f; // Fix margó a virtuális felbontáshoz képest
-        glBegin(GL_QUADS);
-        glVertex2f(hm, hm);
-        glVertex2f(virtual_w - hm, hm);
-        glVertex2f(virtual_w - hm, virtual_h - hm);
-        glVertex2f(hm, virtual_h - hm);
-        glEnd();
-        
-        // Címsor (Kicsinyítve 25-ről 20-ra)
-        glColor3f(1.0f, 1.0f, 0.0f);
-        draw_text("HASZNALATI UTMUTATO", hm + 150, hm + 40, 20.0f);
-
-        float start_y = hm + 120;
-        float line_h = 35.0f; // Sortávolság is kisebb lett (45-ről 35-re)
-        float text_size = 13.0f; // Szövegméret 18-ról 13-ra csökkentve!
-        
-        // Mozgás szekció
-        glColor3f(1.0f, 1.0f, 1.0f);
-        draw_text("W, S      - ELORE / HATRA MOZGAS", hm + 40, start_y, text_size);
-        draw_text("A, D      - BALRA / JOBBRA FORDULAS", hm + 40, start_y + line_h, text_size);
-        draw_text("Q, E      - MAGASSAG (FEL / LE)", hm + 40, start_y + line_h*2, text_size);
-        
-        // Fények szekció
-        glColor3f(0.0f, 1.0f, 1.0f);
-        draw_text("+ / -      - FENYERO PLUSZ / MINUSZ", hm + 40, start_y + line_h*3.5, text_size);
-        draw_text("I / K     - FENYERO (ALTERNATIV)", hm + 40, start_y + line_h*4.5, text_size);
-
-        // Nap szekció
-        draw_text("U / O - Nap szögének állítása", hm + 40, start_y + line_h*6, text_size);
-        draw_text("U / O - Nap szögének állítása", hm + 40, start_y + line_h*7, text_size);
-        
-        // Egyéb szekció
-        glColor3f(1.0f, 0.5f, 0.0f);
-        draw_text("ESC       - KILEPES A JATEKBOL", hm + 40, start_y + line_h*9, text_size);
-        draw_text("F1 VAGY H - EZ A MENU ELREJTESE", hm + 40, start_y + line_h*10, text_size);
-    }
-
-    glDisable(GL_BLEND);
-    
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+    SDL_Quit();
 }

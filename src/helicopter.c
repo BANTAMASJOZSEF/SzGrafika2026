@@ -7,16 +7,11 @@ void init_helicopter(Helicopter* heli) {
     heli->y = 5.0f;
     heli->z = 0.0f;
     heli->rotation_y = 0.0f;
-    heli->rotor_angle = 0.0f;
     heli->base_speed = 30.0f;
     heli->model_id = load_obj("assets/helicopter/10621_CoastGuardHelicopter.obj");
     heli->texture_id = load_texture_sdl("assets/helicopter/HH65C.jpg");
 }
 
-void update_helicopter(Helicopter* heli, double delta_time) {
-    heli->rotor_angle += 700.0f * delta_time;
-    if (heli->rotor_angle > 360.0f) heli->rotor_angle -= 360.0f;
-}
 
 void move_helicopter(Helicopter* heli, float speed, float direction) {
     float rad = heli->rotation_y * 3.14159f / 180.0f;
@@ -56,4 +51,7 @@ void draw_helicopter(Helicopter* heli, bool is_shadow) {
         }
     }
     glPopMatrix();
+}
+
+void update_helicopter(Helicopter* heli, double delta_time) {
 }

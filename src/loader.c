@@ -34,9 +34,9 @@ GLuint load_obj(const char* filename) {
     }
 
     int v_cap = 10000, vt_cap = 10000, vn_cap = 10000;
-    float (*v)[3] = malloc(v_cap * sizeof(*v));
-    float (*vt)[2] = malloc(vt_cap * sizeof(*vt));
-    float (*vn)[3] = malloc(vn_cap * sizeof(*vn));
+    float (*v)[3] = malloc(v_cap * sizeof(*v)); // csúcspontok
+    float (*vt)[2] = malloc(vt_cap * sizeof(*vt)); // textúrakoordináták
+    float (*vn)[3] = malloc(vn_cap * sizeof(*vn)); // normálvektorok
     
     if (!v || !vt || !vn) {
         return 0;
